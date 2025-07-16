@@ -193,8 +193,9 @@
       <title>Nxtscape - 0.2.0</title>
       <description sparkle:format="plain-text">
 – Support for overriding baseUrl in OpenAI, Claude
-– Gemini support in BYOK
-– Improved tool calling in Browser Agent
+ – Gemini support in BYOK
+ – Azure OpenAI support in BYOK
+ – Improved tool calling in Browser Agent
       </description>
       <sparkle:version>7154.84</sparkle:version>
       <sparkle:shortVersionString>0.2.0</sparkle:shortVersionString>

@@ -39,7 +39,14 @@ index 97bb4be60af93..1803d96b758e1 100644
 +  (*s_allowlist)["nxtscape.openai_model"] = settings_api::PrefType::kString;
 +  (*s_allowlist)["nxtscape.openai_base_url"] = settings_api::PrefType::kString;
 +
++
++  // Azure OpenAI provider settings
++  (*s_allowlist)["nxtscape.azure_api_key"] = settings_api::PrefType::kString;
++  (*s_allowlist)["nxtscape.azure_deployment"] = settings_api::PrefType::kString;
++  (*s_allowlist)["nxtscape.azure_base_url"] = settings_api::PrefType::kString;
++  (*s_allowlist)["nxtscape.azure_version"] = settings_api::PrefType::kString;
 +  // Anthropic provider settings
+
 +  (*s_allowlist)["nxtscape.anthropic_api_key"] = settings_api::PrefType::kString;
 +  (*s_allowlist)["nxtscape.anthropic_model"] = settings_api::PrefType::kString;
 +  (*s_allowlist)["nxtscape.anthropic_base_url"] = settings_api::PrefType::kString;
@@ -85,6 +92,12 @@ index 9a00400829ae1..5a5b278252383 100644
 +  registry->RegisterStringPref("nxtscape.openai_model", "gpt-4o");
 +  registry->RegisterStringPref("nxtscape.openai_base_url", "");
 +
++
++  // Azure OpenAI provider settings
++  registry->RegisterStringPref("nxtscape.azure_api_key", "");
++  registry->RegisterStringPref("nxtscape.azure_deployment", "");
++  registry->RegisterStringPref("nxtscape.azure_base_url", "");
++  registry->RegisterStringPref("nxtscape.azure_version", "2024-02-15-preview");
 +  // Anthropic provider settings
 +  registry->RegisterStringPref("nxtscape.anthropic_api_key", "");
 +  registry->RegisterStringPref("nxtscape.anthropic_model", "claude-3-5-sonnet-latest");
@@ -250,6 +263,9 @@ index 0000000000000..28e18b5f69f95
 +        background: linear-gradient(135deg, #10a37f 0%, #1a7f64 100%);
 +      }
 +
++      #azureSection .provider-card-icon {
++        background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
++      }
 +      #anthropicSection .provider-card-icon {
 +        background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
 +      }
@@ -604,6 +620,65 @@ index 0000000000000..28e18b5f69f95
 +      </div>
 +
 +      <!-- Anthropic Card -->
++      <!-- Azure OpenAI Card -->
++      <div class="provider-card" id="azureSection"
++           class$="[[getProviderCardClass_('azure', prefs.nxtscape.default_provider.value)]]">
++        <div class="provider-card-header">
++          <div class="provider-card-icon">
++            <span>AZ</span>
++          </div>
++          <div class="provider-card-info">
++            <h3 class="provider-card-name">Azure OpenAI</h3>
++            <div class="provider-card-status">
++              <span class="status-dot"></span>
++              <span>[[getProviderStatus_('azure', prefs.nxtscape.default_provider.value)]]</span>
++            </div>
++          </div>
++        </div>
++        <div class="provider-card-content">
++          <div class="form-group">
++            <label class="form-label" for="azureApiKey">API Key</label>
++            <input type="password"
++                   id="azureApiKey"
++                   class="form-field"
++                   value="[[prefs.nxtscape.azure_api_key.value]]"
++                   on-input="onAzureApiKeyChange_"
++                   placeholder="Enter your Azure OpenAI API key"
++                   required>
++            <div class="form-helper">Your Azure OpenAI API key (required)</div>
++          </div>
++          <div class="form-group">
++            <label class="form-label" for="azureBaseUrl">Endpoint</label>
++            <input type="url"
++                   id="azureBaseUrl"
++                   class="form-field"
++                   value="[[prefs.nxtscape.azure_base_url.value]]"
++                   on-input="onAzureBaseUrlChange_"
++                   placeholder="https://YOUR_RESOURCE.openai.azure.com">
++            <div class="form-helper">Azure OpenAI endpoint URL</div>
++          </div>
++          <div class="form-group">
++            <label class="form-label" for="azureDeployment">Deployment Name</label>
++            <input type="text"
++                   id="azureDeployment"
++                   class="form-field"
++                   value="[[prefs.nxtscape.azure_deployment.value]]"
++                   on-input="onAzureDeploymentChange_"
++                   placeholder="Your deployment name">
++            <div class="form-helper">Azure OpenAI deployment name</div>
++          </div>
++          <div class="form-group">
++            <label class="form-label" for="azureVersion">API Version</label>
++            <input type="text"
++                   id="azureVersion"
++                   class="form-field"
++                   value="[[prefs.nxtscape.azure_version.value]]"
++                   on-input="onAzureVersionChange_"
++                   placeholder="2024-02-15-preview">
++            <div class="form-helper">API version</div>
++          </div>
++        </div>
++      </div>
 +      <div class="provider-card" id="anthropicSection"
 +           class$="[[getProviderCardClass_('anthropic', prefs.nxtscape.default_provider.value)]]">
 +        <div class="provider-card-header">
@@ -907,6 +982,45 @@ index 0000000000000..8c4421ef76e45
 +    // Update the preference using PrefsMixin
 +    // @ts-ignore: setPrefValue exists at runtime from PrefsMixin
 +    this.setPrefValue('nxtscape.openai_base_url', value);
++    this.showStatusMessage_();
++  }
++  /**
++   * Handle Azure OpenAI API key change
++   */
++  private onAzureApiKeyChange_(e: Event) {
++    const input = e.target as HTMLInputElement;
++    const value = input.value;
++    this.setPrefValue('nxtscape.azure_api_key', value);
++    this.showStatusMessage_();
++  }
++
++  /**
++   * Handle Azure OpenAI base URL change
++   */
++  private onAzureBaseUrlChange_(e: Event) {
++    const input = e.target as HTMLInputElement;
++    const value = input.value;
++    this.setPrefValue('nxtscape.azure_base_url', value);
++    this.showStatusMessage_();
++  }
++
++  /**
++   * Handle Azure OpenAI deployment name change
++   */
++  private onAzureDeploymentChange_(e: Event) {
++    const input = e.target as HTMLInputElement;
++    const value = input.value;
++    this.setPrefValue('nxtscape.azure_deployment', value);
++    this.showStatusMessage_();
++  }
++
++  /**
++   * Handle Azure OpenAI version change
++   */
++  private onAzureVersionChange_(e: Event) {
++    const input = e.target as HTMLInputElement;
++    const value = input.value;
++    this.setPrefValue('nxtscape.azure_version', value);
 +    this.showStatusMessage_();
 +  }
 +

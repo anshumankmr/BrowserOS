@@ -34,7 +34,7 @@
    - [macOS](https://bit.ly/nxtscape)
    - [Windows](https://bit.ly/browseros-windows)
 2. Import your Chrome data (optional)
-3. Connect your AI provider (OpenAI, Anthropic, or local Ollama)
+3. Connect your AI provider (OpenAI, **Azure OpenAI**, Anthropic, or local Ollama)
 4. Start automating!
 
 ## What makes BrowserOS special
